@@ -4,11 +4,11 @@ import './SelectionPage.css';
 
 const SelectionPage = () => {
     const games = [
-        { name: 'Sunny Squares', author: 'Aria Quinn', icon: '/images/icons8-sun-48.png', link: '/games/easy' },
-        { name: 'Easy Breeze', author: 'Leo Park', icon: '/images/icons8-breeze-64.png', link: '/games/easy' },
-        { name: 'Calm Grid', author: 'Mira Chen', icon: '/images/icons8-woman-in-lotus-position-48.png', link: '/games/normal' },
-        { name: 'Morning Puzzle', author: 'Jae Lee', icon: '/images/icons8-morning-48.png', link: '/games/normal' },
-        { name: 'Gentle Start', author: 'Nisha Das', icon: '/images/icons8-start-48.png', link: '/games/easy' },
+        { name: 'Sunny Squares', author: 'Aria Quinn', icon: '/public/icons8-sun-48.png', link: '/games/easy' },
+        { name: 'Easy Breeze', author: 'Leo Park', icon: '/public/icons8-breeze-64.png', link: '/games/easy' },
+        { name: 'Calm Grid', author: 'Mira Chen', icon: '/public/icons8-woman-in-lotus-position-48.png', link: '/games/normal' },
+        { name: 'Morning Puzzle', author: 'Jae Lee', icon: '/public/icons8-morning-48.png', link: '/games/normal' },
+        { name: 'Gentle Start', author: 'Nisha Das', icon: '/public/icons8-start-48.png', link: '/games/easy' },
     ];
 
     return (
