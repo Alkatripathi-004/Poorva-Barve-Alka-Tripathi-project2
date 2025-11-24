@@ -1,7 +1,61 @@
+// src/context/GameContext.jsx
 import React, { createContext, useState, useEffect } from 'react';
-import { generatePuzzle, checkMove } from '../logic/sudokuLogic';
+import { generatePuzzle } from '../logic/sudokuLogic'; // We only need generatePuzzle here now
 
 export const GameContext = createContext();
+
+// A new, more robust validation function that lives inside the context
+const validateBoard = (board) => {
+    const size = board.length;
+    const newBoard = JSON.parse(JSON.stringify(board)); // Work on a copy
+
+    // Reset all errors first
+    for (const r of newBoard) {
+        for (const cell of r) {
+            cell.isIncorrect = false;
+        }
+    }
+
+    // Helper to find and mark duplicates in an array of cells
+    const findAndMarkDuplicates = (cells) => {
+        const counts = {};
+        for (const cell of cells) {
+            if (cell.value !== 0) {
+                counts[cell.value] = (counts[cell.value] || 0) + 1;
+            }
+        }
+        for (const cell of cells) {
+            if (counts[cell.value] > 1) {
+                cell.isIncorrect = true;
+            }
+        }
+    };
+
+    // Check all rows and columns
+    for (let i = 0; i < size; i++) {
+        const row = newBoard[i];
+        const column = newBoard.map(r => r[i]);
+        findAndMarkDuplicates(row);
+        findAndMarkDuplicates(column);
+    }
+
+    // Check all subgrids
+    const subgridSize = size === 6 ? [2, 3] : [3, 3]; // [rows, cols]
+    for (let r = 0; r < size; r += subgridSize[0]) {
+        for (let c = 0; c < size; c += subgridSize[1]) {
+            const subgrid = [];
+            for (let rowInBox = 0; rowInBox < subgridSize[0]; rowInBox++) {
+                for (let colInBox = 0; colInBox < subgridSize[1]; colInBox++) {
+                    subgrid.push(newBoard[r + rowInBox][c + colInBox]);
+                }
+            }
+            findAndMarkDuplicates(subgrid);
+        }
+    }
+
+    return newBoard;
+};
+
 
 export const GameProvider = ({ children, mode }) => {
     const [initialBoard, setInitialBoard] = useState([]);
@@ -21,7 +75,7 @@ export const GameProvider = ({ children, mode }) => {
                 isIncorrect: false,
             }))
         );
-        setInitialBoard(JSON.parse(JSON.stringify(formattedBoard))); // Deep copy
+        setInitialBoard(JSON.parse(JSON.stringify(formattedBoard)));
         setBoard(formattedBoard);
         setSolution(puzzleSolution);
         setIsComplete(false);
@@ -30,7 +84,7 @@ export const GameProvider = ({ children, mode }) => {
     };
 
     const resetGame = () => {
-        setBoard(JSON.parse(JSON.stringify(initialBoard))); // Deep copy
+        setBoard(JSON.parse(JSON.stringify(initialBoard)));
         setIsComplete(false);
         setTimer(0);
         setIsRunning(true);
@@ -39,7 +93,7 @@ export const GameProvider = ({ children, mode }) => {
     const updateCellValue = (row, col, value) => {
         if (isComplete) return;
 
-        const newBoard = [...board];
+        const newBoard = JSON.parse(JSON.stringify(board));
         const numValue = value === '' ? 0 : parseInt(value, 10);
         
         const maxVal = mode === 'easy' ? 6 : 9;
@@ -47,15 +101,8 @@ export const GameProvider = ({ children, mode }) => {
         
         newBoard[row][col].value = numValue;
 
-        for (let r = 0; r < newBoard.length; r++) {
-            for (let c = 0; c < newBoard.length; c++) {
-                if (newBoard[r][c].value !== 0 && !newBoard[r][c].isInitial) {
-                    newBoard[r][c].isIncorrect = !checkMove(newBoard, r, c, newBoard[r][c].value);
-                }
-            }
-        }
-        
-        setBoard(newBoard);
+        const validatedBoard = validateBoard(newBoard);
+        setBoard(validatedBoard);
     };
     
     const selectCell = (row, col) => {
@@ -73,15 +120,22 @@ export const GameProvider = ({ children, mode }) => {
     }, [isRunning, isComplete]);
 
     useEffect(() => {
-        if (board.length === 0) return;
+        if (board.length === 0 || isComplete) return;
+
         const isFilled = board.every(row => row.every(cell => cell.value !== 0));
         const hasNoErrors = board.every(row => row.every(cell => !cell.isIncorrect));
 
         if (isFilled && hasNoErrors) {
-            setIsComplete(true);
-            setIsRunning(false);
+            const isCorrect = board.every((row, rIndex) => 
+                row.every((cell, cIndex) => cell.value === solution[rIndex][cIndex])
+            );
+            
+            if (isCorrect) {
+                setIsComplete(true);
+                setIsRunning(false);
+            }
         }
-    }, [board]);
+    }, [board, solution, isComplete]);
     
     useEffect(() => {
         newGame();
