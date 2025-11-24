@@ -9,7 +9,7 @@
     background: #fff;
     color: #333;
     border-radius: 8px;
-    overflow: hidden; /* To make border-radius work with children */
+    overflow: hidden; 
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
