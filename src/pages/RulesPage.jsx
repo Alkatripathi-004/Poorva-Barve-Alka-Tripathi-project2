@@ -20,7 +20,7 @@ const RulesPage = () => {
                 <ul className="links">
                     <li>Email: <a href="mailto:barve.p@northeastern.edu">barve.p@northeastern.edu</a></li>
                     <li>Email: <a href="mailto:tripathi.al@northeastern.edu">tripathi.al@northeastern.edu</a></li>
-                    <li>GitHub: <a href="https://github.khoury.northeastern.edu/Alka-and-Poorva/CS5610-Sudoku-Project1" target="_blank" rel="noopener noreferrer">Project Repository</a></li>
+                    <li>GitHub: <a href="https://github.com/Alkatripathi-004/Poorva-Barve-Alka-Tripathi-project2" target="_blank" rel="noopener noreferrer">Project Repository</a></li>
                 </ul>
             </section>
         </div>
