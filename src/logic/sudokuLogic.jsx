@@ -49,25 +49,22 @@ const puzzles = {
     ]
 };
 
-// Function to get a random puzzle for a given mode
 export const generatePuzzle = (mode) => {
     const puzzleSet = puzzles[mode];
     const randomIndex = Math.floor(Math.random() * puzzleSet.length);
-    return JSON.parse(JSON.stringify(puzzleSet[randomIndex])); // Return a deep copy
+    return JSON.parse(JSON.stringify(puzzleSet[randomIndex])); 
 };
 
-// Function to check if a move is valid
+
 export const checkMove = (board, row, col, num) => {
     const size = board.length;
     
-    // Check row and column
     for (let i = 0; i < size; i++) {
         if (board[row][i].value === num || board[i][col].value === num) {
             return false;
         }
     }
 
-    // Check subgrid
     const subgridSize = Math.sqrt(size);
     const startRow = Math.floor(row / subgridSize) * subgridSize;
     const startCol = Math.floor(col / subgridSize) * subgridSize;

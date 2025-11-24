@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import './SelectionPage.css';
 
 const SelectionPage = () => {
-    // Mocked data for the game list
     const games = [
         { name: 'Sunny Squares', author: 'Aria Quinn', icon: '/images/icons8-sun-48.png', link: '/games/easy' },
         { name: 'Easy Breeze', author: 'Leo Park', icon: '/images/icons8-breeze-64.png', link: '/games/easy' },

@@ -12,7 +12,6 @@ export const GameProvider = ({ children, mode }) => {
     const [timer, setTimer] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
 
-    // Initialize a new game
     const newGame = () => {
         const { board: puzzleBoard, solution: puzzleSolution } = generatePuzzle(mode);
         const formattedBoard = puzzleBoard.map(row => 
@@ -30,7 +29,6 @@ export const GameProvider = ({ children, mode }) => {
         setIsRunning(true);
     };
 
-    // Reset the current game
     const resetGame = () => {
         setBoard(JSON.parse(JSON.stringify(initialBoard))); // Deep copy
         setIsComplete(false);
@@ -38,20 +36,17 @@ export const GameProvider = ({ children, mode }) => {
         setIsRunning(true);
     };
 
-    // Update a cell's value
     const updateCellValue = (row, col, value) => {
         if (isComplete) return;
 
         const newBoard = [...board];
         const numValue = value === '' ? 0 : parseInt(value, 10);
         
-        // Validate input range (1-6 for easy, 1-9 for normal)
         const maxVal = mode === 'easy' ? 6 : 9;
         if (numValue < 0 || numValue > maxVal || isNaN(numValue)) return;
         
         newBoard[row][col].value = numValue;
 
-        // Check for incorrect placements
         for (let r = 0; r < newBoard.length; r++) {
             for (let c = 0; c < newBoard.length; c++) {
                 if (newBoard[r][c].value !== 0 && !newBoard[r][c].isInitial) {
@@ -63,12 +58,10 @@ export const GameProvider = ({ children, mode }) => {
         setBoard(newBoard);
     };
     
-    // Set the currently selected cell
     const selectCell = (row, col) => {
         setSelectedCell({ row, col });
     };
 
-    // Timer logic
     useEffect(() => {
         let interval;
         if (isRunning && !isComplete) {
@@ -79,7 +72,6 @@ export const GameProvider = ({ children, mode }) => {
         return () => clearInterval(interval);
     }, [isRunning, isComplete]);
 
-    // Check for win condition
     useEffect(() => {
         if (board.length === 0) return;
         const isFilled = board.every(row => row.every(cell => cell.value !== 0));
@@ -91,7 +83,6 @@ export const GameProvider = ({ children, mode }) => {
         }
     }, [board]);
     
-    // Start a game on component mount
     useEffect(() => {
         newGame();
     }, [mode]);

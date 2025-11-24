@@ -4,7 +4,6 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    /* This ensures it takes up vertical space, helping with centering */
     min-height: calc(100vh - 120px); 
 }
 
@@ -22,9 +21,8 @@
 }
 
 .home-links {
-    /* This is the key change: use flexbox to create space */
     display: flex;
-    gap: 1.5rem; /* This creates the space BETWEEN the links */
+    gap: 1.5rem; 
 }
 
 .home-links a {
