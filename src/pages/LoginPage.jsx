@@ -1,5 +1,5 @@
 import React from 'react';
-import './FormPages.css'; // Shared CSS for login and register
+import './FormPages.css';
 
 const LoginPage = () => {
     return (

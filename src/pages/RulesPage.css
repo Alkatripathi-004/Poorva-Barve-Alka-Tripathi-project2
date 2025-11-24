@@ -2,7 +2,7 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 2rem;
-    color: #333; /* Dark text for readability on light cards */
+    color: #333; 
 }
 
 .rules-card, .credits-card {

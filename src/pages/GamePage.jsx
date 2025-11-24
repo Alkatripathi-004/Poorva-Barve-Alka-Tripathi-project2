@@ -4,7 +4,7 @@ import { GameProvider, GameContext } from '../context/GameContext';
 import Board from '../components/Board';
 import Timer from '../components/Timer';
 import GameControls from '../components/GameControls';
-import './GamePage.css'; // We'll add some styles
+import './GamePage.css'; 
 
 const GamePageContent = () => {
     const { isComplete } = React.useContext(GameContext);
@@ -19,9 +19,8 @@ const GamePageContent = () => {
 };
 
 const GamePage = () => {
-    const { mode } = useParams(); // Gets 'easy' or 'normal' from the URL
+    const { mode } = useParams(); 
 
-    // Validate the mode
     if (mode !== 'easy' && mode !== 'normal') {
         return <div>Invalid game mode.</div>;
     }

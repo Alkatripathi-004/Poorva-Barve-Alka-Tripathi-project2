@@ -13,7 +13,7 @@
   }
   
   main {
-    padding: 80px 20px 20px 20px; /* Top padding is for the navbar */
+    padding: 80px 20px 20px 20px; 
     max-width: 1200px;
     margin: 0 auto;
   }
