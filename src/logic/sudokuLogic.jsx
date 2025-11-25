@@ -1,62 +1,140 @@
-// src/logic/sudokuLogic.js
 
-const puzzles = {
-    easy: [
-        {
-            board: [
-                [3, 0, 0, 0, 0, 0],
-                [0, 0, 1, 0, 5, 6],
-                [0, 3, 0, 0, 0, 1],
-                [5, 0, 0, 0, 6, 0],
-                [1, 6, 0, 5, 0, 0],
-                [0, 0, 0, 0, 0, 2],
-            ],
-            // CORRECTED: The solution is now fully filled and valid.
-            solution: [
-                [3, 5, 6, 1, 2, 4],
-                [2, 4, 1, 3, 5, 6],
-                [4, 3, 2, 6, 5, 1],
-                [5, 1, 4, 2, 6, 3],
-                [1, 6, 2, 5, 4, 3], // Corrected values based on the puzzle
-                [6, 4, 5, 3, 1, 2], // Corrected values based on the puzzle
-            ]
-        }
-    ],
-    normal: [
-        {
-            board: [
-                [5, 3, 0, 0, 7, 0, 0, 0, 0],
-                [6, 0, 0, 1, 9, 5, 0, 0, 0],
-                [0, 9, 8, 0, 0, 0, 0, 6, 0],
-                [8, 0, 0, 0, 6, 0, 0, 0, 3],
-                [4, 0, 0, 8, 0, 3, 0, 0, 1],
-                [7, 0, 0, 0, 2, 0, 0, 0, 6],
-                [0, 6, 0, 0, 0, 0, 2, 8, 0],
-                [0, 0, 0, 4, 1, 9, 0, 0, 5],
-                [0, 0, 0, 0, 8, 0, 0, 7, 9],
-            ],
-            solution: [
-                [5, 3, 4, 6, 7, 8, 9, 1, 2],
-                [6, 7, 2, 1, 9, 5, 3, 4, 8],
-                [1, 9, 8, 3, 4, 2, 5, 6, 7],
-                [8, 5, 9, 7, 6, 1, 4, 2, 3],
-                [4, 2, 6, 8, 5, 3, 7, 9, 1],
-                [7, 1, 3, 9, 2, 4, 8, 5, 6],
-                [9, 6, 1, 5, 3, 7, 2, 8, 4],
-                [2, 8, 7, 4, 1, 9, 6, 3, 5],
-                [3, 4, 5, 2, 8, 6, 1, 7, 9],
-            ]
-        }
-    ]
-};
+// src/logic/sudokuLogic.js - Dynamic Sudoku Puzzle Generator
 
+// Helper function: check if the number is valid in the entire row
+function validInRow(row, num, board) {
+    for (let col = 0; col < board[row].length; col++) {
+        if (board[row][col] === num) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Helper function: check if the number is valid in the entire column
+function validInColumn(col, num, board, boardSize) {
+    for (let row = 0; row < boardSize; row++) {
+        if (board[row][col] === num) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Helper function: check if the number is valid in the subgrid
+function validInGrid(row, col, num, board, subgridHeight, subgridWidth) {
+    const startRow = Math.floor(row / subgridHeight) * subgridHeight;
+    const startCol = Math.floor(col / subgridWidth) * subgridWidth;
+
+    for (let r = startRow; r < startRow + subgridHeight; r++) {
+        for (let c = startCol; c < startCol + subgridWidth; c++) {
+            if (board[r][c] === num) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Helper function for combined validity check: row, column, and subgrid
+function isNumValid(row, col, num, board, boardSize, subgridHeight, subgridWidth) {
+    return validInRow(row, num, board) &&
+           validInColumn(col, num, board, boardSize) &&
+           validInGrid(row, col, num, board, subgridHeight, subgridWidth);
+}
+
+// Helper function to create an empty board
+function createEmptyBoard(boardSize) {
+    const board = [];
+    for (let i = 0; i < boardSize; i++) {
+        board.push(new Array(boardSize).fill(0));
+    }
+    return board;
+}
+
+// Helper function to shuffle the number array (Fisher-Yates shuffle)
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Helper function to populate the entire board with valid values using backtracking
+function populateBoard(board, boardSize) {
+    const subgridHeight = boardSize === 9 ? 3 : 2;
+    const subgridWidth = 3;
+
+    for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+            const numbers = [];
+            for (let i = 1; i <= boardSize; i++) {
+                numbers.push(i);
+            }
+            shuffleArray(numbers);
+
+            let placed = false;
+            for (let num of numbers) {
+                if (isNumValid(row, col, num, board, boardSize, subgridHeight, subgridWidth)) {
+                    board[row][col] = num;
+                    placed = true;
+                    break;
+                }
+            }
+
+            if (!placed) {
+                // Reset board and restart generation
+                for (let r = 0; r < boardSize; r++) {
+                    for (let c = 0; c < boardSize; c++) {
+                        board[r][c] = 0;
+                    }
+                }
+                row = -1;
+                break;
+            }
+        }
+    }
+}
+
+// Function to remove random cells to create the puzzle
+function removeRandomCells(board, boardSize) {
+    // Easy (6x6): remove fewer cells, Normal (9x9): remove more cells
+    const totalCellsToRemove = boardSize === 9 ? 51 : 18;
+
+    let removed = 0;
+    while (removed < totalCellsToRemove) {
+        const row = Math.floor(Math.random() * boardSize);
+        const col = Math.floor(Math.random() * boardSize);
+
+        if (board[row][col] !== 0) {
+            board[row][col] = 0;
+            removed++;
+        }
+    }
+}
+
+// Main function to build a Sudoku puzzle
+function buildSudokuPuzzle(boardSize) {
+    const board = createEmptyBoard(boardSize);
+    populateBoard(board, boardSize);
+
+    // Deep copy for solution before removing cells
+    const solution = board.map(row => [...row]);
+
+    // Remove cells to create the puzzle
+    removeRandomCells(board, boardSize);
+
+    return { board, solution };
+}
+
+// Export the generatePuzzle function that the GameContext uses
 export const generatePuzzle = (mode) => {
-    const puzzleSet = puzzles[mode];
-    const randomIndex = Math.floor(Math.random() * puzzleSet.length);
-    return JSON.parse(JSON.stringify(puzzleSet[randomIndex])); 
+    const boardSize = mode === 'easy' ? 6 : 9;
+    return buildSudokuPuzzle(boardSize);
 };
 
-// ... (The rest of this file can remain as it was, with the correct 6x6 subgrid logic)
+// Validation function for checking moves during gameplay
 const isMoveValid = (board, row, col, num) => {
     const size = board.length;
     for (let i = 0; i < size; i++) {
@@ -86,7 +164,7 @@ const isMoveValid = (board, row, col, num) => {
 export const checkMove = (board, row, col, num) => {
     const tempBoard = board.map(r => r.map(c => c.value));
     const originalValue = tempBoard[row][col];
-    tempBoard[row][col] = 0; 
+    tempBoard[row][col] = 0;
     const isValid = isMoveValid(tempBoard, row, col, num);
     tempBoard[row][col] = originalValue;
     return isValid;
